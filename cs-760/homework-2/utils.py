@@ -63,17 +63,24 @@ class DecisionTree():
         self.num_nodes += 1
         return Node(y, best_feature, best_threshold, left, right)
     
-    # Choose split with highest information gain
+    # Choose split with highest information gain ratio
     def _choose_split(self, X, y):
-        best_feature, best_threshold, best_gain = None, None, 0.0
+        best_feature, best_threshold, best_gain_ratio = None, None, 0.0
         for feature in ["x1", "x2"]:
             thresholds = np.unique(X[feature])
             for threshold in thresholds:
+                entropy = self._entropy(y)
                 gain = self._information_gain(y, threshold, X[feature])
-                if gain > best_gain:
-                    best_feature, best_threshold, best_gain = feature, threshold, gain
+                if entropy == 0:
+                    #print("feature: {}, threshold: {}, info_gain: {}".format(feature, threshold, gain))
+                    return None, None
+                else:
+                    gain_ratio = gain/entropy
+                    #print("feature: {}, threshold: {}, info_gain_ratio: {}".format(feature, threshold, gain_ratio))
+                if gain_ratio > best_gain_ratio:
+                    best_feature, best_threshold, best_gain_ratio = feature, threshold, gain_ratio
 
-        if best_gain == 0:
+        if best_gain_ratio == 0:
             return None, None
         return best_feature, best_threshold
     

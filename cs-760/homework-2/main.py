@@ -4,9 +4,10 @@ from sklearn.tree import DecisionTreeClassifier
 
 
 if __name__ == '__main__':
-    """Question 1"""
 
-    """Question 2"""
+    # """Question 1"""
+
+    # """Question 2"""
 
     """Question 3"""
     druns = get_data("data/Druns.txt")
