@@ -3,6 +3,7 @@ from scipy.interpolate import lagrange
 import pandas as pd
 import matplotlib.pyplot as plt
 import os 
+import csv
 
 class Node():
     def __init__(self, y, feature=None, threshold=None, left=None, right=None):
@@ -207,8 +208,8 @@ def plot_decision_boundary(classifier, data, output_file=None,limits = None):
     
     return
 
-def plot_error_n(classifiers, test_data, label = None,output_file=None):
-    """Plot err_n vs n for a list of classifiers."""
+def get_n_num_nodes_errn(classifiers, n_list, test_data, label=None, output_file=None):
+    """Get n, num_nodes and err_n for a list of classifiers."""
     num_nodes_list=[]
     errn_list=[]
 
@@ -220,7 +221,29 @@ def plot_error_n(classifiers, test_data, label = None,output_file=None):
             num_nodes_list.append(classifiers[k].num_nodes)
             errn_list.append(classifiers[k].err_n(test_data))
     
-    plt.scatter(num_nodes_list, errn_list, label=label)
+    if output_file:
+        # Check if directory exists
+        directory = os.path.dirname(output_file)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        with open(output_file, 'w') as f:
+            writer = csv.writer(f)
+            writer.writerow(['n', 'num_nodes', 'err_n'])
+            writer.writerows(zip(n_list, num_nodes_list, errn_list))
+
+    return n_list, num_nodes_list, errn_list
+
+def plot_error_n(classifiers, sizes, test_data, label = None,output_file=None):
+    """Plot err_n vs n for a list of classifiers."""
+    errn_list=[]
+
+    for k in range(len(classifiers)):
+        if label == "sklearn":
+            errn_list.append(1-classifiers[k].score(test_data[['x1','x2']],test_data['y']))
+        else:
+            errn_list.append(classifiers[k].err_n(test_data))
+    
+    plt.scatter(sizes, errn_list, label=label)
     plt.xlabel('n')
     plt.ylabel('err_n')
     plt.legend()
@@ -233,15 +256,16 @@ def plot_error_n(classifiers, test_data, label = None,output_file=None):
         plt.clf()
     else:
         plt.show()
-    return num_nodes_list, errn_list
+    return sizes, errn_list
 
 def sample_uniform(a,b,n,mean=None,std=1):
     # Sample n points from [a,b] with noise N(mean,std)
     x = np.random.uniform(a,b,n)
-    if mean is not None:
-        x += np.random.normal(mean,std,n)
     
     y = np.sin(x)
+    if mean is not None:
+        x += np.random.normal(mean,std,n)
+
     df = pd.DataFrame(np.c_[x,y], columns=['x', 'y'])
     return df
 
