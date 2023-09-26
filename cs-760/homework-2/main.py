@@ -27,8 +27,8 @@ if __name__ == '__main__':
     d2 = get_data("data/D2.txt")
 
     # Plot data
-    show_data(d1, "figures/scatter_plots/D1.pdf")
-    show_data(d2, "figures/scatter_plots/D2.pdf")
+    show_data(d1, "cs-760/homework-2/figures/scatter_plots/D1.pdf")
+    show_data(d2, "cs-760/homework-2/figures/scatter_plots/D2.pdf")
 
     tree1 = DecisionTree()
     tree1.fit(d1)
@@ -39,8 +39,8 @@ if __name__ == '__main__':
     tree2.plot_tree()
 
     # Plot decision boundaries
-    plot_decision_boundary(tree1, d1, "figures/decision_boundaries/Decision_D1.pdf",[0,1,0,1])
-    plot_decision_boundary(tree2, d2, "figures/decision_boundaries/Decision_D2.pdf",[0,1,0,1])
+    plot_decision_boundary(tree1, d1, "cs-760/homework-2/figures/decision_boundaries/Decision_D1.pdf",[0,1,0,1])
+    plot_decision_boundary(tree2, d2, "cs-760/homework-2/figures/decision_boundaries/Decision_D2.pdf",[0,1,0,1])
 
     """Question 7"""
     sizes = [32, 128, 512, 2048, 8192]
@@ -49,10 +49,10 @@ if __name__ == '__main__':
 
     for k in range(len(train_sets)):
         trees[k].fit(train_sets[k])
-        plot_decision_boundary(trees[k],train_sets[k], "figures/decision_boundaries/Decision_Dbig_{}.pdf".format(sizes[k]),[-1.5,1.5,-1.5,1.5])
+        plot_decision_boundary(trees[k],train_sets[k], "cs-760/homework-2/figures/decision_boundaries/Decision_Dbig_{}.pdf".format(sizes[k]),[-1.5,1.5,-1.5,1.5])
         
     # Plot n vs errn
-    num_nodes_list, errn_list = plot_error_n(trees, test_set, output_file= "figures/error_n/Decision_Dbig.pdf")
+    num_nodes_list, errn_list = plot_error_n(trees, test_set, output_file= "cs-760/homework-2/figures/error_n/Decision_Dbig.pdf")
         
 
     #Create CSV file with number of nodes and err_n
@@ -69,7 +69,7 @@ if __name__ == '__main__':
         sktrees[k].fit(train_sets[k][['x1','x2']],train_sets[k]['y'])
 
     # Plot n vs errn
-    sknum_nodes_list, skerrn_list = plot_error_n(sktrees, test_set, label="sklearn", output_file= "figures/error_n/skDecision_Dbig.pdf")
+    sknum_nodes_list, skerrn_list = plot_error_n(sktrees, test_set, label="sklearn", output_file= "cs-760/homework-2/figures/error_n/skDecision_Dbig.pdf")
 
     #Create CSV file with number of nodes and err_n
     with open('skDecision_Dbig.csv', 'w') as f:

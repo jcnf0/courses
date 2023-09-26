@@ -56,7 +56,7 @@ class DecisionTree():
         best_feature, best_threshold = self._choose_split(X, y)
         if best_feature is None or best_threshold is None:
             return Node(y)
-        left_indices = X[best_feature] < best_threshold
+        left_indices = X[best_feature] >= best_threshold
         right_indices = ~left_indices
         left = self._build_tree(X[left_indices], y[left_indices])
         right = self._build_tree(X[right_indices], y[right_indices])
@@ -87,7 +87,7 @@ class DecisionTree():
     # Calculate information gain
     def _information_gain(self, y, threshold, feature):
         parent_entropy = self._entropy(y)
-        left_indices = feature < threshold
+        left_indices = feature >= threshold
         right_indices = ~left_indices
         if len(y[left_indices]) == 0 or len(y[right_indices]) == 0:
             return 0
@@ -107,7 +107,7 @@ class DecisionTree():
     def _predict(self, x, node):
         if node.is_leaf:
             return node.value
-        if x[node.feature] < node.threshold:
+        if x[node.feature] >= node.threshold:
             return self._predict(x, node.left)
         return self._predict(x, node.right)
     
@@ -125,10 +125,10 @@ class DecisionTree():
         else:
             feature_name = node.feature
             threshold = node.threshold
-            print(f"{prefix}{feature_name} <= {threshold:.2f}")
+            print(f"{prefix}{feature_name} >= {threshold:.2f}")
             self._plot_tree(node.left, depth + 1)
             print(prefix + "|")
-            print(f"{prefix}{feature_name} > {threshold:.2f}")
+            print(f"{prefix}{feature_name} < {threshold:.2f}")
             self._plot_tree(node.right, depth + 1)
 
     
