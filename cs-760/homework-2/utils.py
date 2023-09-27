@@ -147,8 +147,13 @@ def data_split(file, split=8192, shuffle=True):
     return data[:split], data[split:]
 
 # Show data in scatterplot with different colors for each class
-def show_data(data,output_file=None):
-    plt.scatter(data["x1"], data["x2"], c=data["y"], cmap=plt.cm.Spectral, s=1)
+def show_data(data,output_file=None, size=1,limits = None):
+    
+    plt.scatter(data["x1"], data["x2"], c=data["y"], cmap=plt.cm.Spectral, s=size)
+    if limits:
+        plt.xlim(limits[0], limits[1])
+        plt.ylim(limits[2], limits[3])
+
     if output_file:
         # Check if directory exists
         directory = os.path.dirname(output_file)
@@ -258,14 +263,10 @@ def plot_error_n(classifiers, sizes, test_data, label = None,output_file=None):
         plt.show()
     return sizes, errn_list
 
-def sample_uniform(a,b,n,mean=None,std=1):
+def sample_uniform(a,b,n):
     # Sample n points from [a,b] with noise N(mean,std)
     x = np.random.uniform(a,b,n)
-    
     y = np.sin(x)
-    if mean is not None:
-        x += np.random.normal(mean,std,n)
-
     df = pd.DataFrame(np.c_[x,y], columns=['x', 'y'])
     return df
 
@@ -274,3 +275,30 @@ def lagrange_test(train,test):
     model = lagrange(train['x'],train['y'])
     # Calculate MSE on test data
     return ((model(train['x'])-train['y'])**2).mean(), ((model(test['x'])-test['y'])**2).mean()
+
+def plot_lagrange(train,test,output_file=None):
+    # Train a polynomial of degree 2 on train data
+    model = lagrange(train['x'],train['y'])
+    # Calculate MSE on test data
+    train_err = ((model(train['x'])-train['y'])**2).mean()
+    test_err = ((model(test['x'])-test['y'])**2).mean()
+
+    # Plot train and test data
+    plt.scatter(train['x'],train['y'],label='train')
+    plt.scatter(test['x'],test['y'],label='test')
+    # Plot polynomial
+    x = np.linspace(min(train['x']),max(train['x']),100)
+    plt.plot(x,model(x),label='model')
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.legend()
+    if output_file:
+        # Check if directory exists
+        directory = os.path.dirname(output_file)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        plt.savefig(output_file)
+        plt.clf()
+    else:
+        plt.show()
+    return train_err, test_err

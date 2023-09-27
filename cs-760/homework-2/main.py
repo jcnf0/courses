@@ -5,42 +5,47 @@ from sklearn.tree import DecisionTreeClassifier
 
 if __name__ == '__main__':
 
-    # """Question 1"""
+    """Question 1"""
 
-    # """Question 2"""
+    """Question 2"""
+    dcraft = get_data("data/Dcraft.txt")
+    treecraft = DecisionTree()
+    treecraft.fit(dcraft)
+    treecraft.plot_tree()
+    show_data(dcraft, "figures/scatter_plots/Dcraft.pdf", size=50,limits=[-1,2,-1,2])
 
-    # """Question 3"""
-    # druns = get_data("data/Druns.txt")
-    # treeruns = DecisionTree()
-    # treeruns.fit(druns)
+    """Question 3"""
+    druns = get_data("data/Druns.txt")
+    treeruns = DecisionTree()
+    treeruns.fit(druns)
 
-    # """Question 4"""
-    # d3leaves = get_data("data/D3leaves.txt")
-    # tree3leaves = DecisionTree()
-    # tree3leaves.fit(d3leaves) 
-    # tree3leaves.plot_tree()
+    """Question 4"""
+    d3leaves = get_data("data/D3leaves.txt")
+    tree3leaves = DecisionTree()
+    tree3leaves.fit(d3leaves) 
+    tree3leaves.plot_tree()
 
-    # """Question 5"""
+    """Question 5"""
 
-    # """Question 6"""
-    # d1 = get_data("data/D1.txt")
-    # d2 = get_data("data/D2.txt")
+    """Question 6"""
+    d1 = get_data("data/D1.txt")
+    d2 = get_data("data/D2.txt")
 
-    # # Plot data
-    # show_data(d1, "figures/scatter_plots/D1.pdf")
-    # show_data(d2, "figures/scatter_plots/D2.pdf")
+    # Plot data
+    show_data(d1, "figures/scatter_plots/D1.pdf")
+    show_data(d2, "figures/scatter_plots/D2.pdf")
 
-    # tree1 = DecisionTree()
-    # tree1.fit(d1)
-    # tree1.plot_tree()
+    tree1 = DecisionTree()
+    tree1.fit(d1)
+    tree1.plot_tree()
 
-    # tree2 = DecisionTree()
-    # tree2.fit(d2)
-    # tree2.plot_tree()
+    tree2 = DecisionTree()
+    tree2.fit(d2)
+    tree2.plot_tree()
 
-    # # Plot decision boundaries
-    # plot_decision_boundary(tree1, d1, "figures/decision_boundaries/Decision_D1.pdf",[0,1,0,1])
-    # plot_decision_boundary(tree2, d2, "figures/decision_boundaries/Decision_D2.pdf",[0,1,0,1])
+    # Plot decision boundaries
+    plot_decision_boundary(tree1, d1, "figures/decision_boundaries/Decision_D1.pdf",[0,1,0,1])
+    plot_decision_boundary(tree2, d2, "figures/decision_boundaries/Decision_D2.pdf",[0,1,0,1])
 
     """Question 7"""
     sizes = [32, 128, 512, 2048, 8192]
@@ -87,25 +92,25 @@ if __name__ == '__main__':
     a = 0
     b = 1
     n = 100
-    e_mean = 0
-    e_std = 1
 
-    lag_train = sample_uniform(a,b,n,0,1)
-    lag_test = sample_uniform(a,b,n,0,1)
+    lag_train = sample_uniform(a,b,n)
+    lag_test = sample_uniform(a,b,n)
+    train_err, test_err = lagrange_test(lag_train, lag_test)
 
-    print(lagrange_test(lag_train, lag_test))
+    plot_lagrange(lag_train, lag_test, "figures/lagrange/lagrange.pdf")
 
     # Test for different values of e_std
-    e_std_list = [0.1, 0.5, 1, 2, 5, 10]
-    train_err_list = []
-    test_err_list = []
+    e_std_list = [0, 0.1, 0.5, 1, 2, 5, 10]
+    train_err_list = [train_err]
+    test_err_list = [test_err]
 
     for e_std in e_std_list:
-        lag_train = sample_uniform(a,b,n,e_mean,e_std)
-        lag_test = sample_uniform(a,b,n,e_mean,e_std)
+        # Add noise to train set x
+        lag_train['x'] = lag_train['x'] + np.random.normal(0, e_std, n)
         train_err, test_err = lagrange_test(lag_train, lag_test)
         train_err_list.append(train_err)
         test_err_list.append(test_err)
+        plot_lagrange(lag_train, lag_test, "figures/lagrange/lagrange_std{}.pdf".format(e_std))
 
     with open('lagrange.csv', 'w') as f:
         writer = csv.writer(f)
