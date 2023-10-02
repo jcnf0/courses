@@ -273,15 +273,16 @@ def sample_uniform(a,b,n):
 def lagrange_test(train,test):
     # Train a polynomial of degree 2 on train data
     model = lagrange(train['x'],train['y'])
-    # Calculate MSE on test data
-    return ((model(train['x'])-train['y'])**2).mean(), ((model(test['x'])-test['y'])**2).mean()
+    # Calculate log MSE on test data
+    
+    return np.log(((model(train['x'])-train['y'])**2).mean()), np.log(((model(test['x'])-test['y'])**2).mean())
 
 def plot_lagrange(train,test,output_file=None):
     # Train a polynomial of degree 2 on train data
     model = lagrange(train['x'],train['y'])
     # Calculate MSE on test data
-    train_err = ((model(train['x'])-train['y'])**2).mean()
-    test_err = ((model(test['x'])-test['y'])**2).mean()
+    train_err = np.log(((model(train['x'])-train['y'])**2).mean())
+    test_err = np.log(((model(train['x'])-train['y'])**2).mean())
 
     # Plot train and test data
     plt.scatter(train['x'],train['y'],label='train')
