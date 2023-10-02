@@ -62,6 +62,7 @@ def knn_cross_val(k, data, y_column, num_folds=5, output_file=None):
         accuracy_list.append(accuracy)
         precision_list.append(precision)
         recall_list.append(recall)
+        print("Fold {}: accuracy = {}, precision = {}, recall = {}".format(i+1, accuracy, precision, recall))
 
     if output_file:
         df = pd.DataFrame({'accuracy': accuracy_list, 'precision': precision_list, 'recall': recall_list})

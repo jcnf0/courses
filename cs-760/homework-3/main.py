@@ -1,13 +1,14 @@
 from utils import *
 
 if __name__ == "__main__":
+
     """Question 1"""
     D2z = get_data("data/D2z.txt")
     plot_knn_predictions([-2,2,-2,2],[0.1,0.1],1,D2z)
 
     """Question 2"""
     emails = pd.read_csv("data/emails.csv").drop("Email No.", axis=1)
-    # knn_cross_val(1, emails, "Prediction", 5)
+    knn_cross_val(1, emails, "Prediction", 5)
 
     # """Question 3"""
     # logistic_regression_cross_val(emails, 0.01, "Prediction", 5)
@@ -26,10 +27,10 @@ if __name__ == "__main__":
     # plt.show()
     # plt.clf()
     
-    """Question 5"""
-    # 4000/1000 split
-    training_data = emails.iloc[:4000]
-    test_data = emails.iloc[4000:]
+    # """Question 5"""
+    # # 4000/1000 split
+    # training_data = emails.iloc[:4000]
+    # test_data = emails.iloc[4000:]
 
-    roc_curves(5, training_data, test_data, "Prediction")
+    # roc_curves(5, training_data, test_data, "Prediction")
     
