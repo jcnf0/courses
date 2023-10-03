@@ -56,9 +56,15 @@ def knn_cross_val(k, data, y_column, num_folds=5, output_file=None):
         test = folds[i]
         #Compute the error for each fold
         y_pred = classifier.fit(train.drop(y_column, axis=1),train[y_column]).predict(test.drop(y_column, axis=1))
-        accuracy = np.mean(y_pred == test[y_column])
-        precision = np.mean(y_pred[y_pred == 1] == test[y_column][y_pred == 1])
-        recall = np.mean(y_pred[y_pred == 1] == test[y_column][y_pred == 1])
+        #Calculate TPR FPR TNR FNR
+        tp = np.sum(y_pred[y_pred == 1] == test[y_column][y_pred == 1])
+        fp = np.sum(y_pred[y_pred == 1] != test[y_column][y_pred == 1])
+        tn = np.sum(y_pred[y_pred == 0] == test[y_column][y_pred == 0])
+        fn = np.sum(y_pred[y_pred == 0] != test[y_column][y_pred == 0])
+
+        accuracy = (tp + tn) / (tp + tn + fp + fn)
+        precision = tp / (tp + fp)
+        recall = tp / (tp + fn)
         accuracy_list.append(accuracy)
         precision_list.append(precision)
         recall_list.append(recall)
@@ -72,7 +78,7 @@ def knn_cross_val(k, data, y_column, num_folds=5, output_file=None):
     return np.mean(accuracy_list), np.mean(precision_list), np.mean(recall_list)
 
 
-def logistic_regression_cross_val(data, eta, y_column, num_folds=5, output_file=None):
+def logistic_regression_cross_val(data, eta, y_column, num_folds=5, epochs=5000, output_file=None):
     """Perform logistic regression cross-validation."""
     # Initialize model with 0 weights with the same number of features as the data
     model = np.zeros(data.shape[1]-1)
@@ -91,16 +97,24 @@ def logistic_regression_cross_val(data, eta, y_column, num_folds=5, output_file=
         test = folds[i]
         test_features = test.drop(y_column, axis=1)
         test_y = test[y_column]
-        for j in range(train.shape[0]):
+        for j in range(epochs):
+            # Take a random training example (SGD)
+            index = np.random.randint(0, train.shape[0])
             # Compute gradient
-            gradient = (train_y.iloc[j] - sigmoid(model, train_features.iloc[j])) * train_features.iloc[j]
+            gradient = (train_y.iloc[index] - sigmoid(model, train_features.iloc[index])) * train_features.iloc[index]
             # Update model
             model += eta * gradient
         # Compute accuracy, precision and recall
         y_pred = test_features.apply(lambda x: sigmoid(model, x), axis=1)
-        accuracy = np.mean(y_pred == test_y)
-        precision = np.mean(y_pred[y_pred == 1] == test_y[y_pred == 1])
-        recall = np.mean(y_pred[y_pred == 1] == test_y[y_pred == 1])
+        #Calculate TPR FPR TNR FNR
+        tp = np.sum(y_pred[y_pred == 1] == test[y_column][y_pred == 1])
+        fp = np.sum(y_pred[y_pred == 1] != test[y_column][y_pred == 1])
+        tn = np.sum(y_pred[y_pred == 0] == test[y_column][y_pred == 0])
+        fn = np.sum(y_pred[y_pred == 0] != test[y_column][y_pred == 0])
+        
+        accuracy = (tp + tn) / (tp + tn + fp + fn)
+        precision = tp / (tp + fp)
+        recall = tp / (tp + fn)
         accuracy_list.append(accuracy)
         precision_list.append(precision)
         recall_list.append(recall)
@@ -110,7 +124,7 @@ def logistic_regression_cross_val(data, eta, y_column, num_folds=5, output_file=
 
     
 
-def roc_curves(k, train_data, test_data, y_column, eta = 0.01, output_file = None):
+def roc_curves(k, train_data, test_data, y_column, eta = 0.01, epochs=5000, output_file = None):
     # Plot ROC curves for kNN and logistic regression
 
     # kNN
@@ -122,9 +136,11 @@ def roc_curves(k, train_data, test_data, y_column, eta = 0.01, output_file = Non
     train_y = train_data[y_column]
     train_features = train_data.drop(y_column, axis=1)
     model = np.zeros(train_data.shape[1]-1)
-    for j in range(train_data.shape[0]):
+    for j in range(epochs):
+        # Take a random training example
+        index = np.random.randint(0, train_data.shape[0])
         # Compute gradient
-        gradient = (train_y.iloc[j] - sigmoid(model, train_features.iloc[j])) * train_features.iloc[j]
+        gradient = (train_y.iloc[index] - sigmoid(model, train_features.iloc[index])) * train_features.iloc[index]
         # Update model
         model += eta * gradient
 
