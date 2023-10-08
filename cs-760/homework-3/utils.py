@@ -101,9 +101,9 @@ def logistic_regression_cross_val(data, eta, y_column, num_folds=5, epochs=5000,
             # Take a random training example (SGD)
             index = np.random.randint(0, train.shape[0])
             # Compute gradient
-            gradient = (train_y.iloc[index] - sigmoid(model, train_features.iloc[index])) * train_features.iloc[index]
+            gradient = (sigmoid(model, train_features.iloc[index])-train_y.iloc[index]) * train_features.iloc[index]
             # Update model
-            model += eta * gradient
+            model -= eta * gradient
         # Compute accuracy, precision and recall
         y_pred = test_features.apply(lambda x: sigmoid(model, x), axis=1)
         #Calculate TPR FPR TNR FNR
@@ -140,9 +140,9 @@ def roc_curves(k, train_data, test_data, y_column, eta = 0.01, epochs=5000, outp
         # Take a random training example
         index = np.random.randint(0, train_data.shape[0])
         # Compute gradient
-        gradient = (train_y.iloc[index] - sigmoid(model, train_features.iloc[index])) * train_features.iloc[index]
+        gradient = (sigmoid(model, train_features.iloc[index])-train_y.iloc[index]) * train_features.iloc[index]
         # Update model
-        model += eta * gradient
+        model -= eta * gradient
 
     y_pred = test_data.drop(y_column, axis=1).apply(lambda x: sigmoid(model, x), axis=1)
     fpr, tpr, thresholds = roc_curve(test_data[y_column], y_pred)
