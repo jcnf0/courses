@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from sklearn.neighbors import KNeighborsClassifier
+import os
 from sklearn.metrics import roc_curve
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,7 +21,47 @@ def get_data(file):
     df = pd.DataFrame(data, columns=['x1', 'x2', 'y'])
     return df
 
-def plot_knn_predictions(grid_limits,grid_step,k,train_data):
+class KNeighborsClassifier:
+    """k-NN classifier."""
+    def __init__(self, n_neighbors):
+        """Initialize classifier."""
+        #Initialize the classifier
+        self.n_neighbors = n_neighbors
+
+    def fit(self, X, y):
+        """Fit the classifier."""
+        #Fit the classifier and get dataframe
+        self.X = X
+        self.y = y
+        
+        return self
+
+    def predict(self, X):
+        """Predict labels for X."""
+        #Predict labels for X
+        y_pred = []
+        for i in range(X.shape[0]):
+            # Compute the Euclidean distance between X[i] and all training examples
+            distances = ((self.X - X.iloc[i])**2).sum(axis=1)**0.5
+            indices = np.argsort(distances)[:self.n_neighbors]
+            labels = self.y.iloc[indices]
+            y_pred.append(labels.value_counts().idxmax())
+        return np.array(y_pred)
+    
+    def predict_proba(self, X):
+        """Predict probabilities for X."""
+        #Predict probabilities for X
+        y_pred = []
+        for i in range(X.shape[0]):
+            # Compute the Euclidean distance between X[i] and all training examples using pandas
+            distances = ((self.X - X.iloc[i])**2).sum(axis=1)**0.5
+            indices = np.argsort(distances)[:self.n_neighbors]
+            labels = self.y.iloc[indices]
+            y_pred.append(labels.value_counts().idxmax())
+        return pd.DataFrame(y_pred)
+
+
+def plot_knn_predictions(grid_limits,grid_step,k,train_data,output_file=None):
     """Plot the predictions of k-NN on a grid."""
     #Return a plot of the predictions of k-NN on a grid
     x1_min, x1_max, x2_min, x2_max = grid_limits
@@ -31,12 +71,19 @@ def plot_knn_predictions(grid_limits,grid_step,k,train_data):
     x1, x2 = np.meshgrid(x1, x2)
     x1 = x1.ravel()
     x2 = x2.ravel()
-    X_grid = np.array([x1, x2]).T
+    X_grid = pd.DataFrame(np.array([x1, x2]).T, columns=['x1', 'x2'])
     y_grid = KNeighborsClassifier(n_neighbors=k).fit(train_data[['x1','x2']],train_data['y']).predict(X_grid)
     plt.scatter(x1, x2, c=y_grid, cmap=plt.cm.Paired)
     # Show training data
     plt.scatter(train_data['x1'], train_data['x2'], c=train_data['y'], cmap=plt.cm.Paired, edgecolors='black')
-    plt.show()
+    if output_file:
+        # Check if directory exists
+        directory = os.path.dirname(output_file)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        plt.savefig(output_file)
+    else:
+        plt.show()
 
 def knn_cross_val(k, data, y_column, num_folds=5, output_file=None):
     """Perform k-NN cross-validation."""
@@ -71,6 +118,10 @@ def knn_cross_val(k, data, y_column, num_folds=5, output_file=None):
         print("Fold {}: accuracy = {}, precision = {}, recall = {}".format(i+1, accuracy, precision, recall))
 
     if output_file:
+        # Check if directory exists
+        directory = os.path.dirname(output_file)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
         df = pd.DataFrame({'accuracy': accuracy_list, 'precision': precision_list, 'recall': recall_list})
         df['fold'] = np.arange(1, num_folds+1)
         df.to_csv(output_file, index=False)
@@ -128,8 +179,10 @@ def roc_curves(k, train_data, test_data, y_column, eta = 0.01, epochs=5000, outp
     # Plot ROC curves for kNN and logistic regression
 
     # kNN
-    y_pred = KNeighborsClassifier(n_neighbors=k).fit(train_data.drop(y_column, axis=1),train_data[y_column]).predict(test_data.drop(y_column, axis=1))
-    fpr, tpr, thresholds = roc_curve(test_data[y_column], y_pred)
+    #y_pred = KNeighborsClassifier(n_neighbors=k).fit(train_data.drop(y_column, axis=1),train_data[y_column]).predict(test_data.drop(y_column, axis=1))
+    # Get y_score
+    y_score = KNeighborsClassifier(n_neighbors=k).fit(train_data.drop(y_column, axis=1),train_data[y_column]).predict_proba(test_data.drop(y_column, axis=1))
+    fpr, tpr, thresholds = roc_curve(test_data[y_column], y_score)
     plt.plot(fpr, tpr, label='kNN')
 
     # Logistic regression
@@ -145,11 +198,21 @@ def roc_curves(k, train_data, test_data, y_column, eta = 0.01, epochs=5000, outp
         model -= eta * gradient
 
     y_pred = test_data.drop(y_column, axis=1).apply(lambda x: sigmoid(model, x), axis=1)
+            
     fpr, tpr, thresholds = roc_curve(test_data[y_column], y_pred)
+
     plt.plot(fpr, tpr, label='Logistic regression')
     plt.legend()
     plt.xlabel('False positive rate')
     plt.ylabel('True positive rate')
     plt.title('ROC curves')
-    plt.show()
+
+    if output_file:
+        # Check if directory exists
+        directory = os.path.dirname(output_file)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        plt.savefig(output_file)
+    else:
+        plt.show()
     
