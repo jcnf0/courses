@@ -23,6 +23,9 @@ if __name__ == "__main__":
     torch_accuracies.append(training_pytorch(d1=200, learning_rate=0.05, num_epochs=10, batch_size=64))
     torch_accuracies.append(training_pytorch(d1=200, learning_rate=0.1, num_epochs=10, batch_size=64))
 
+    training_pytorch(d1=200, learning_rate=0.1, num_epochs=10, batch_size=64,weigth_init="zeros")
+    training_pytorch(d1=200, learning_rate=0.1, num_epochs=10, batch_size=64,weigth_init="random")
+
     plt.figure()
     plt.plot(scratch_accuracies, label="scratch")
     plt.plot(torch_accuracies, label="torch")

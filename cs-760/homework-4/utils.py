@@ -114,7 +114,7 @@ def training_scratch(d1 = 200, learning_rate = 0.01, num_epochs = 10, batch_size
     plt.plot(losses)
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
-    plt.title("Learning Curve")
+    plt.title("Scratch D1 = {}, Batch Size = {}, LR = {}, Weight Init = random".format(d1,batch_size,learning_rate))
     plt.savefig("figures/Scratch_Loss_D1_{}_BatchSize_{}_LR_{}.pdf".format(d1,batch_size,learning_rate))
     plt.clf()
 
@@ -184,11 +184,11 @@ def training_pytorch(d1 = 200, learning_rate = 0.01, num_epochs = 10, batch_size
     plt.plot(loss_values)
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
-    plt.title("Learning Curve")
+    plt.title("Pytorch D1 = {}, Batch Size = {}, LR = {}, Weigth Init = {}".format(d1,batch_size,learning_rate,weigth_init))
 
     if os.path.isdir("figures") == False:
         os.mkdir("figures")
 
-    plt.savefig("figures/Loss_D1_{}_BatchSize_{}_LR_{}_WeigthInit_".format(d1,batch_size,learning_rate) + weigth_init + ".pdf")
+    plt.savefig("figures/Loss_D1_{}_BatchSize_{}_LR_{}_WeigthInit_{}".format(d1,batch_size,learning_rate, weigth_init)+ ".pdf")
     plt.clf()
     return 100 * correct / total
