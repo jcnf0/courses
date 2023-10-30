@@ -104,6 +104,7 @@ for label in ['e', 'j', 's']:
         class_probs = np.zeros(num_classes)
         for j in range(num_classes):
             class_probs[j] = np.sum(np.multiply(theta[j],x))
+        print("Class probabilities for {}: {}".format(filename, class_probs))
         
         # Calculate the posterior log probabilities
         posterior_probs = class_probs + prior_probs

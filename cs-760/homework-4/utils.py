@@ -88,18 +88,18 @@ def training_scratch(d1 = 200, learning_rate = 0.01, num_epochs = 10, batch_size
         return np.sum(y_pred == y_true) / len(y_true)
 
     # Load MNIST dataset with torchvision
-    mnist = datasets.MNIST(root="./data", train=True, download=True)
-    
+    train_ds = datasets.MNIST(root="./data", train=True, download=True)
+    test_ds = datasets.MNIST(root="./data", train=False, download=True)
     # Extract features and labels
-    X = mnist.data.numpy()
-    y = mnist.targets.numpy()
-    X = X / 255.0
-    y = y.astype(np.uint8)
+    X_train = train_ds.data.numpy()
+    y_train = train_ds.targets.numpy()
+    X_train = X_train / 255.0
+    y_train = y_train.astype(np.uint8)
 
-    # Split dataset into train and test
-    X_train, y_train = X[:50000], y[:50000]
-    X_test, y_test = X[50000:], y[50000:]
-
+    X_test = test_ds.data.numpy()
+    y_test = test_ds.targets.numpy()
+    X_test = X_test / 255.0
+    y_test = y_test.astype(np.uint8)
 
     # Initialize weights
     W1 = np.random.randn(d1, 784)
@@ -115,7 +115,7 @@ def training_scratch(d1 = 200, learning_rate = 0.01, num_epochs = 10, batch_size
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.title("Learning Curve")
-    plt.savefig("figures/Scratch_Loss_D1_{}_BatchSize_{}_LR_{}.png".format(d1,batch_size,learning_rate))
+    plt.savefig("figures/Scratch_Loss_D1_{}_BatchSize_{}_LR_{}.pdf".format(d1,batch_size,learning_rate))
     plt.clf()
 
     # Predict the labels
@@ -189,6 +189,6 @@ def training_pytorch(d1 = 200, learning_rate = 0.01, num_epochs = 10, batch_size
     if os.path.isdir("figures") == False:
         os.mkdir("figures")
 
-    plt.savefig("figures/Loss_D1_{}_BatchSize_{}_LR_{}_WeigthInit_".format(d1,batch_size,learning_rate) + weigth_init + ".png")
+    plt.savefig("figures/Loss_D1_{}_BatchSize_{}_LR_{}_WeigthInit_".format(d1,batch_size,learning_rate) + weigth_init + ".pdf")
     plt.clf()
     return 100 * correct / total

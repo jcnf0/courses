@@ -30,4 +30,4 @@ if __name__ == "__main__":
     plt.title("Accuracies for Scratch vs Torch")
     plt.xlabel("Setting")
     plt.ylabel("Accuracy")
-    plt.savefig("figures/accuracies_scratch_vs_torch.png")
+    plt.savefig("figures/accuracies_scratch_vs_torch.pdf", bbox_inches="tight")
