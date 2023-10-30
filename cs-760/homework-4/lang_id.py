@@ -34,15 +34,26 @@ for label in ['e', 'j', 's']:
         
         # Read the file and count the characters
         with open(os.path.join(data_dir, filename), "r") as f:
-            text = f.read()
+            text = f.read().replace('\n', '')
             for char in text:
                 if char in vocabulary:
                     char_counts[class_idx, vocabulary.index(char)] += 1
 
 # Calculate the prior probabilities with additive smoothing
 total_docs = len(os.listdir(data_dir))
+num_docs = np.zeros(num_classes)
+for label in ['e', 'j', 's']:
+    for i in range(10):
+        if label == "e":
+            class_idx = 0
+        elif label == "j":
+            class_idx = 1
+        else:
+            class_idx = 2
+        num_docs[class_idx] += 1
+
 for i in range(num_classes):
-    prior_probs[i] = np.log((np.sum(char_counts[i]) + alpha) / (np.sum(char_counts) + alpha*num_classes))
+    prior_probs[i] = np.log((num_docs[i] + alpha) / (np.sum(num_docs) + alpha*num_classes))
 
 # Initialize the array to hold the probabilities
 theta = np.zeros((num_classes, len(vocabulary)))
@@ -83,7 +94,7 @@ for label in ['e', 'j', 's']:
         
         # Read the file and represent it as a bag-of-words count vector
         with open(os.path.join(data_dir, filename), "r") as f:
-            text = f.read()
+            text = f.read().replace('\n', '')
             x = np.zeros(len(vocabulary))
             for char in text:
                 if char in vocabulary:

@@ -20,16 +20,18 @@ class Net(nn.Module):
         x = self.fc2(x)
         return nn.functional.softmax(x, dim=1)
     
-def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
 
-def softmax(x):
-    return np.exp(x) / np.sum(np.exp(x))
-
-def cross_entropy_loss(y, y_hat):
-    return -np.sum(y * np.log(y_hat))
 
 def training_scratch(d1 = 200, learning_rate = 0.01, num_epochs = 10, batch_size = 64):
+    def sigmoid(x):
+        return 1 / (1 + np.exp(-x))
+
+    def softmax(x):
+        return np.exp(x) / np.sum(np.exp(x))
+
+    def cross_entropy_loss(y, y_hat):
+        return -np.sum(y * np.log(y_hat))
+        
     def forward(x, W1, W2):
         z1 = np.dot(W1, x)
         a1 = sigmoid(z1)
@@ -68,8 +70,8 @@ def training_scratch(d1 = 200, learning_rate = 0.01, num_epochs = 10, batch_size
                     newgrad_W1, newgrad_W2 = backward(x_batch, y_batch, y_hat, a1, W2)
                     grad_W1 += newgrad_W1
                     grad_W2 += newgrad_W2
-                W1 -= learning_rate * grad_W1
-                W2 -= learning_rate * grad_W2
+                W1 -= learning_rate * grad_W1/batch_size
+                W2 -= learning_rate * grad_W2/batch_size
 
             epoch_loss /= num_batches
             print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss}')
@@ -123,10 +125,10 @@ def training_scratch(d1 = 200, learning_rate = 0.01, num_epochs = 10, batch_size
 
     # Calculate the accuracy
     print(f"Accuracy: {100*accuracy(y_pred, y_test)}%")
-    return 100*accuracy(y_pred, y_test)
+    return 100*accuracy(y_pred, y_test), losses
     
-def training_pytorch(d1 = 200, learning_rate = 0.01, num_epochs = 10, batch_size = 64, weigth_init = "random"):
-    loss_values = []
+def training_pytorch(d1 = 200, learning_rate = 0.01, num_epochs = 10, batch_size = 64, weight_init = "random"):
+    losses = []
     # MNIST dataset
     transform = transforms.Compose([transforms.ToTensor()])
     train_dataset = datasets.MNIST('./data', train=True, download=True, transform=transform)
@@ -142,10 +144,10 @@ def training_pytorch(d1 = 200, learning_rate = 0.01, num_epochs = 10, batch_size
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
     # Initialize the weights
-    if weigth_init == "zeros":
+    if weight_init == "zeros":
         model.fc1.weight.data = torch.zeros(d1, 784)
         model.fc2.weight.data = torch.zeros(10, d1)
-    elif weigth_init == "random":
+    elif weight_init == "random":
         model.fc1.weight.data = torch.randn(d1, 784)
         model.fc2.weight.data = torch.randn(10, d1)
         # Set between -1 and 1
@@ -165,7 +167,7 @@ def training_pytorch(d1 = 200, learning_rate = 0.01, num_epochs = 10, batch_size
             optimizer.step()
 
         print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item()}')
-        loss_values.append(loss.item())
+        losses.append(loss.item())
 
     # Test the model
     model.eval()
@@ -181,14 +183,14 @@ def training_pytorch(d1 = 200, learning_rate = 0.01, num_epochs = 10, batch_size
         print(f'Accuracy: {100 * correct / total}%')
 
     # Plot the learning curve
-    plt.plot(loss_values)
+    plt.plot(losses)
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
-    plt.title("Pytorch D1 = {}, Batch Size = {}, LR = {}, Weigth Init = {}".format(d1,batch_size,learning_rate,weigth_init))
+    plt.title("Pytorch D1 = {}, Batch Size = {}, LR = {}, Weigth Init = {}".format(d1,batch_size,learning_rate,weight_init))
 
     if os.path.isdir("figures") == False:
         os.mkdir("figures")
 
-    plt.savefig("figures/Loss_D1_{}_BatchSize_{}_LR_{}_WeigthInit_{}".format(d1,batch_size,learning_rate, weigth_init)+ ".pdf")
+    plt.savefig("figures/Loss_D1_{}_BatchSize_{}_LR_{}_WeigthInit_{}".format(d1,batch_size,learning_rate, weight_init)+ ".pdf")
     plt.clf()
-    return 100 * correct / total
+    return 100 * correct / total, losses
