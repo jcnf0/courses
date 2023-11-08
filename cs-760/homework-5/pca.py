@@ -6,13 +6,23 @@ if __name__ == '__main__':
     top_d1, error1, recon1 = buggy_pca(data2D, d)
     top_d2, error2, recon2= demeaned_pca(data2D, d)
     top_d3, error3, recon3 = normalized_pca(data2D, d)
+    _,_, error4, recon4 = dro(data2D, d)
 
     compare_2d(data2D, recon1, 'figures/buggy_pca2D.pdf')
     compare_2d(data2D, recon2, 'figures/demeaned_pca2D.pdf')
     compare_2d(data2D, recon3, 'figures/normalized_pca2D.pdf')
+    compare_2d(data2D, recon4, 'figures/dro2D.pdf')
     print("Error for buggy PCA: {}".format(error1))
     print("Error for demeaned PCA: {}".format(error2))
     print("Error for normalized PCA: {}".format(error3))
+    print("Error for DRO: {}".format(error4))
+
+    # Plot errors for 2D
+    plt.plot([error1, error2, error3, error4])
+    plt.xticks([0, 1, 2, 3], ['Buggy PCA', 'Demeaned PCA', 'Normalized PCA', 'DRO'])
+    plt.title('Error for 2D')
+    plt.ylabel('Error')
+    plt.savefig("figures/error_2D.pdf")
 
     data1000D = get_data('data/data1000D.csv')
     Z, A, error, reconstructed_data = dro(data1000D, 50)
