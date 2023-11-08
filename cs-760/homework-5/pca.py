@@ -22,7 +22,7 @@ if __name__ == '__main__':
     error_list_demeaned = []
     error_list_normalized = []
     error_list_dro = []
-    for d in [5, 10, 25, 50, 100 , 200, 500, 1000]:
+    for d in [5, 10, 25, 50, 100 , 200, 500]:
         _, error1,_ = buggy_pca(data1000D, d)
         _, error2,_ = demeaned_pca(data1000D, d)
         _, error3,_ = normalized_pca(data1000D, d)

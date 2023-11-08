@@ -211,7 +211,7 @@ def dro(data,d):
 
     return Z, A, error, reconstructed_data
 
-def compare_2d(data,reconstructed,save_path = None):
+def compare_2d(data, reconstructed, save_path = None):
     # Plot original data
     plt.scatter(data[:,0], data[:,1], label='Original data')
     
