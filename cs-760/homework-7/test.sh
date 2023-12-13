@@ -1,0 +1,5 @@
+python run.py -s a2c -t 1000 -d CartPole-v1 -G 200 -e 2000 -a 0.001 -g 0.8 -l "[32]"
+python run.py -s a2c -t 1000 -d CartPole-v1 -G 200 -e 2000 -a 0.005 -g 0.8 -l "[32]"
+python run.py -s a2c -t 1000 -d CartPole-v1 -G 200 -e 2000 -a 0.01 -g 0.8 -l "[32]"
+python run.py -s a2c -t 1000 -d CartPole-v1 -G 200 -e 2000 -a 0.05 -g 0.8 -l "[32]"
+python run.py -s a2c -t 1000 -d CartPole-v1 -G 200 -e 2000 -a 0.1 -g 0.8 -l "[32]"
